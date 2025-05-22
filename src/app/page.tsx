@@ -1,103 +1,144 @@
-import Image from "next/image";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useKeenSlider } from 'keen-slider/react';
+import 'keen-slider/keen-slider.min.css';
 
-export default function Home() {
+export default function AutoSlider() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [sliderRef, slider] = useKeenSlider({
+    loop: true,
+    mode: 'free',
+    slides: {
+      perView: 1.32,
+      spacing: 20,
+      origin: 'center'
+    },
+    slideChanged(s) {
+      setCurrentSlide(s.track.details.rel);
+      console.log('Slide index:', s.track.details.rel);
+    },
+  });
+
+  // Auto-play logic
+  useEffect(() => {
+    if (!slider.current || !isPlaying) return;
+
+    const interval = setInterval(() => {
+      slider.current?.next();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [slider, isPlaying]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="pb-20">
+      {/* Slider Section */}
+      <div
+        onMouseEnter={() => setIsPlaying(false)}
+        onMouseLeave={() => setIsPlaying(true)}
+      >
+        <div ref={sliderRef} className="keen-slider h-96">
+          <div className="keen-slider__slide bg-red-400 flex items-center justify-center text-white text-2xl rounded-xl">Slide 1</div>
+          <div className="keen-slider__slide bg-blue-400 flex items-center justify-center text-white text-2xl rounded-xl">Slide 2</div>
+          <div className="keen-slider__slide bg-green-400 flex items-center justify-center text-white text-2xl rounded-xl">Slide 3</div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Indicator */}
+        <div className="flex justify-center mt-4 space-x-2">
+          {[0, 1, 2].map((idx) => (
+            <button
+              key={idx}
+              onClick={() => slider.current?.moveToIdx(idx)}
+              className={`w-2 h-2 rounded-full ${currentSlide === idx ? 'bg-amber-500' : 'bg-gray-300'}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Menu Section */}
+      <section id="signatureMeal" className="px-52 mt-20">
+        <div className="flex flex-col gap-y-3 mb-6">
+          <p className="text-xl font-bold">Menu</p>
+          <p>Where Every Dish Tells a Story</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="shadow-md hover:shadow-xl h-64 rounded-md flex items-center justify-center">
+              Gambar {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <button className="flex items-center gap-2 hover:underline transition-colors">
+            <span className="text-xl">See Menu</span>
+            <img
+              src="/icons/right-arrow-svgrepo-com.svg"
+              alt="Right Arrow"
+              className="w-6"
+            />
+          </button>
+        </div>
+      </section>
+
+      {/* News Section */}
+      <section id='News' className='px-52 mt-20'>
+        <div className='text-xl font-bold mb-6'>Latest News</div>
+
+        <div className='grid grid-rows-4 gap-8'>
+          {["news1", "news2", "news3", "news5"].map((item) => (
+            <div key={item} className='shadow-md hover:shadow-xl h-30 p-4 rounded-md'>
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <button className="flex items-center gap-2 hover:underline transition-colors">
+            <span className="text-xl">Explore News</span>
+            <img
+              src="/icons/right-arrow-svgrepo-com.svg"
+              alt="Right Arrow"
+              className="w-6"
+            />
+          </button>
+        </div>
+
+      </section>
+
+      {/* Review Section */}
+      <section id='review' className='px-52 mt-20'>
+        <div className="flex flex-col gap-y-3 mb-6">
+          <p className="text-xl font-bold">Reviews</p>
+          <p>What They’re Saying After Every Bite!</p>
+        </div>
+
+        <div className='grid grid-cols-2 grid-rows-3 gap-8'>
+          {["review1", "review2", "review3", "review4", "review5", "review6",].map((item) => (
+            <div key={item} className='shadow-md hover:shadow-xl h-30 p-4 rounded-md'>
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <button className="flex items-center gap-2 hover:underline transition-colors">
+            <span className="text-xl">View All The Reviews</span>
+            <img
+              src="/icons/right-arrow-svgrepo-com.svg"
+              alt="Right Arrow"
+              className="w-6"
+            />
+          </button>
+        </div>
+      </section>
+
+      {/* Additional Section (kosong) */}
+      <section className="px-52 mt-20">
+
+      </section>
     </div>
   );
 }
