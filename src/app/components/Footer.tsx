@@ -24,7 +24,7 @@ export default function Footer() {
 
             <div className="flex justify-end items-center mt-6">
                 <img src="/icons/code-box-svgrepo-com.svg" alt="codebox" className="w-10" />
-                <p>Airell Restaurant Project Repo</p>
+                <a href="https://github.com/AirellAristos/menu-web-app-frontend" className="hover:underline">Airell Restaurant Project Git Repo</a>
             </div>
         </div>
     )
